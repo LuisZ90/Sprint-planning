@@ -165,6 +165,7 @@ const initialBacklog = [
   },
 
 
+
   
   // Agrega más historias aquí...
 ];
@@ -188,6 +189,20 @@ const App = () => {
     setBacklog(
       backlog.map((item) =>
         item.id === id ? { ...item, estado: newState } : item
+      )
+    );
+  };
+
+  // Función para eliminar una tarea
+  const deleteTask = (id) => {
+    setBacklog(backlog.filter((item) => item.id !== id));
+  };
+
+  // Función para editar los detalles de una tarea
+  const editTask = (id, updatedDetails) => {
+    setBacklog(
+      backlog.map((item) =>
+        item.id === id ? { ...item, ...updatedDetails } : item
       )
     );
   };
@@ -230,7 +245,13 @@ const App = () => {
           {backlog
             .filter((item) => !item.sprint || item.sprint !== selectedSprint)
             .map((item) => (
-              <BacklogCard key={item.id} item={item} onAssign={assignToSprint} />
+              <BacklogCard
+                key={item.id}
+                item={item}
+                onAssign={assignToSprint}
+                onDelete={deleteTask}
+                onEdit={editTask}
+              />
             ))}
         </div>
       </div>
@@ -245,6 +266,8 @@ const App = () => {
               key={item.id}
               item={item}
               onChangeState={changeState}
+              onDelete={deleteTask}
+              onEdit={editTask}
             />
           ))}
         </div>
@@ -254,34 +277,141 @@ const App = () => {
 };
 
 // Componente para representar cada ficha del backlog
-const BacklogCard = ({ item, onAssign }) => {
+const BacklogCard = ({ item, onAssign, onDelete, onEdit }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedAlias, setEditedAlias] = useState(item.alias);
+  const [editedEnunciado, setEditedEnunciado] = useState(item.enunciado);
+  const [editedEsfuerzo, setEditedEsfuerzo] = useState(item.esfuerzo);
+
+  // Guardar cambios al editar
+  const saveChanges = () => {
+    onEdit(item.id, {
+      alias: editedAlias,
+      enunciado: editedEnunciado,
+      esfuerzo: parseInt(editedEsfuerzo),
+    });
+    setIsEditing(false);
+  };
+
   return (
     <div style={styles.card}>
-      <h3>{item.alias}</h3>
-      <p>{item.enunciado}</p>
-      <p>
-        <strong>Esfuerzo:</strong> {item.esfuerzo}
-      </p>
-      <button onClick={() => onAssign(item.id)} style={styles.button}>
-        Asignar al Sprint
-      </button>
+      {isEditing ? (
+        <div>
+          <input
+            type="text"
+            value={editedAlias}
+            onChange={(e) => setEditedAlias(e.target.value)}
+            placeholder="Alias"
+            style={styles.input}
+          />
+          <textarea
+            value={editedEnunciado}
+            onChange={(e) => setEditedEnunciado(e.target.value)}
+            placeholder="Enunciado"
+            style={styles.textarea}
+          />
+          <input
+            type="number"
+            value={editedEsfuerzo}
+            onChange={(e) => setEditedEsfuerzo(e.target.value)}
+            placeholder="Esfuerzo"
+            style={styles.input}
+          />
+          <button onClick={saveChanges} style={styles.button}>
+            Guardar
+          </button>
+          <button onClick={() => setIsEditing(false)} style={styles.button}>
+            Cancelar
+          </button>
+        </div>
+      ) : (
+        <div>
+          <h3>{item.alias}</h3>
+          <p>{item.enunciado}</p>
+          <p>
+            <strong>Esfuerzo:</strong> {item.esfuerzo}
+          </p>
+        </div>
+      )}
+      <div style={styles.actions}>
+        <button onClick={() => setIsEditing(true)} style={styles.button}>
+          Editar
+        </button>
+        <button onClick={() => onAssign(item.id)} style={styles.button}>
+          Asignar al Sprint
+        </button>
+        <button onClick={() => onDelete(item.id)} style={styles.button}>
+          Eliminar
+        </button>
+      </div>
     </div>
   );
 };
 
 // Componente para representar cada ficha del sprint
-const SprintCard = ({ item, onChangeState }) => {
+const SprintCard = ({ item, onChangeState, onDelete, onEdit }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedAlias, setEditedAlias] = useState(item.alias);
+  const [editedEnunciado, setEditedEnunciado] = useState(item.enunciado);
+  const [editedEsfuerzo, setEditedEsfuerzo] = useState(item.esfuerzo);
+
+  // Guardar cambios al editar
+  const saveChanges = () => {
+    onEdit(item.id, {
+      alias: editedAlias,
+      enunciado: editedEnunciado,
+      esfuerzo: parseInt(editedEsfuerzo),
+    });
+    setIsEditing(false);
+  };
+
   return (
     <div style={styles.card}>
-      <h3>{item.alias}</h3>
-      <p>{item.enunciado}</p>
-      <p>
-        <strong>Esfuerzo:</strong> {item.esfuerzo}
-      </p>
-      <p>
-        <strong>Estado:</strong> {item.estado}
-      </p>
+      {isEditing ? (
+        <div>
+          <input
+            type="text"
+            value={editedAlias}
+            onChange={(e) => setEditedAlias(e.target.value)}
+            placeholder="Alias"
+            style={styles.input}
+          />
+          <textarea
+            value={editedEnunciado}
+            onChange={(e) => setEditedEnunciado(e.target.value)}
+            placeholder="Enunciado"
+            style={styles.textarea}
+          />
+          <input
+            type="number"
+            value={editedEsfuerzo}
+            onChange={(e) => setEditedEsfuerzo(e.target.value)}
+            placeholder="Esfuerzo"
+            style={styles.input}
+          />
+          <button onClick={saveChanges} style={styles.button}>
+            Guardar
+          </button>
+          <button onClick={() => setIsEditing(false)} style={styles.button}>
+            Cancelar
+          </button>
+        </div>
+      ) : (
+        <div>
+          <h3>{item.alias}</h3>
+          <p>{item.enunciado}</p>
+          <p>
+            <strong>Esfuerzo:</strong> {item.esfuerzo}
+          </p>
+          <p>
+            <strong>Estado:</strong> {item.estado}
+          </p>
+        </div>
+      )}
       <div style={styles.actions}>
+        <button onClick={() => setIsEditing(true)} style={styles.button}>
+          Editar
+        </button>
         <button
           onClick={() => onChangeState(item.id, "In Progress")}
           style={styles.button}
@@ -293,6 +423,9 @@ const SprintCard = ({ item, onChangeState }) => {
           style={styles.button}
         >
           Completado
+        </button>
+        <button onClick={() => onDelete(item.id)} style={styles.button}>
+          Eliminar
         </button>
       </div>
     </div>
@@ -343,6 +476,23 @@ const styles = {
     cursor: "pointer",
     backgroundColor: "#007bff",
     color: "white",
+  },
+  input: {
+    width: "100%",
+    padding: "10px",
+    fontSize: "16px",
+    marginBottom: "10px",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+  },
+  textarea: {
+    width: "100%",
+    padding: "10px",
+    fontSize: "16px",
+    marginBottom: "10px",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+    resize: "vertical",
   },
 };
 
