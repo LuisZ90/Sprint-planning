@@ -1,0 +1,349 @@
+import React, { useState } from 'react';
+
+// Datos iniciales del backlog
+const initialBacklog = [
+  {
+    id: "AR1",
+    enunciado:
+      "Como desarrollador quiero recopilar requisitos funcionales y no funcionales mediante encuestas y entrevistas.",
+    alias: "Analisis y requerimientos",
+    estado: "To Do",
+    esfuerzo: 5,
+    sprint: "",
+    prioridad: "Must",
+    comentarios:
+      "Incluir resultados de residentes y limitaciones del proyecto",
+  },
+  {
+    id: "AR2",
+    enunciado:
+      "Como desarrollador quiero definir alcance del proyecto y plan de acción con cronograma y presupuesto.",
+    alias: "Analisis y requerimientos",
+    estado: "To Do",
+    esfuerzo: 8,
+    sprint: "",
+    prioridad: "Must",
+    comentarios: "Identificar riesgos y estrategias de mitigación.",
+  },
+  {
+    id: "DP1",
+    enunciado:
+      "Como desarrollador quiero diseñar prototipo con características de alojamiento, seguridad y módulos clave.",
+    alias: "Diseño del prototipo",
+    estado: "To Do",
+    esfuerzo: 13,
+    sprint: "",
+    prioridad: "Must",
+    comentarios: "Validar seguridad (ej: autenticación de dos factores).",
+  },
+  {
+    id: "DP2",
+    enunciado:
+      "Como desarrollador quiero especificar diagramas de flujo y UI para módulos de finanzas, comunicación y admin.",
+    alias: "Diseño del propotipo",
+    estado: "To Do",
+    esfuerzo: 8,
+    sprint: "",
+    prioridad: "Should",
+    comentarios: "Retroalimentación con mesa directiva en Sprint 3.",
+  },
+
+{
+    id: "DV1",
+    enunciado:
+      " Como desarrollador quiero implementar módulo de finanzas: cobro de cuotas, estados de cuenta y pasarela de pagos.",
+    alias: "Desarrollo",
+    estado: "To Do",
+    esfuerzo: 21,
+    sprint: "",
+    prioridad: "Must",
+    comentarios: " Integrar API de pasarela de pagos.",
+  },
+
+{
+    id: "DV2",
+    enunciado:
+      " Como desarrollador quiero desarrollar módulo de comunicación: avisos, calendario, foro y alertas de emergencia..",
+    alias: "Desarrollo",
+    estado: "To Do",
+    esfuerzo: 18,
+    sprint: "",
+    prioridad: "Must",
+    comentarios: " Priorizar canal de emergencias.",
+  },
+
+{
+    id: "DV3",
+    enunciado:
+      " Como desarrollador quiero construir módulo de administración: organigrama, planes de trabajo y contacto directivo.",
+    alias: "Desarrollo",
+    estado: "To Do",
+    esfuerzo: 13,
+    sprint: "",
+    prioridad: "Should",
+    comentarios: "Sincronizar con base de datos de residentes..",
+  },
+
+{
+    id: "PV1",
+    enunciado:
+      " Como desarrollador quiero ejecutar pruebas internas de funcionalidad, usabilidad y accesibilidad..",
+    alias: "Pruebas y validación",
+    estado: "To Do",
+    esfuerzo: 8,
+    sprint: "",
+    prioridad: "MUST",
+    comentarios: "Usar casos de prueba basados en requisitos.",
+  },
+{
+    id: "PV2",
+    enunciado:
+      " Como desarrollador quiero realizar pruebas con mesa directiva y ajustar según feedback.",
+    alias: " Pruebas y validación ",
+    estado: "To Do",
+    esfuerzo:5 ,
+    sprint: "",
+    prioridad: "MUST",
+    comentarios: "Documentar incidencias.",
+  },
+
+
+
+
+
+
+{
+    id: "LC1",
+    enunciado:
+      " Como desarrollador quiero desplegar versión final en servidor y configurar entorno de producción..",
+    alias: " Lanzamiento y capacitación ",
+    estado: "To Do",
+    esfuerzo:5 ,
+    sprint: "",
+    prioridad: "MUST",
+    comentarios: "Asegurar certificado SSL y backup inicial..",
+  },
+
+{
+    id: "LC2",
+    enunciado:
+      " Como desarrollador quiero crear manuales de usuario y recursos de soporte .",
+    alias: " Lanzamiento y capacitación ",
+    estado: "To Do",
+    esfuerzo:8 ,
+    sprint: "",
+    prioridad: "SHOULD",
+    comentarios: "Incluir guía de accesibilidad para adultos mayores..",
+  },
+
+
+
+
+
+{
+    id: "CM1",
+    enunciado:
+      " Como desarrollador quiero elaborar documento de cierre con lecciones aprendidas y recomendaciones.",
+    alias: " Cierre y mantenimiento ",
+    estado: "To Do",
+    esfuerzo:3 ,
+    sprint: "",
+    prioridad: "COULD",
+    comentarios: "Compartir con stakeholders vía email y repositorio..",
+  },
+
+{
+    id: "CM2",
+    enunciado:
+      " Como desarrollador quiero definir plan de mantenimiento: actualizaciones, soporte técnico y gestión de incidencias..",
+    alias: " Cierre y mantenimiento ",
+    estado: "To Do",
+    esfuerzo:5 ,
+    sprint: "",
+    prioridad: "MUST",
+    comentarios: "Usar métricas (ej: tiempo de respuesta < 24h).",
+  },
+
+
+  
+  // Agrega más historias aquí...
+];
+
+// Componente principal
+const App = () => {
+  const [backlog, setBacklog] = useState(initialBacklog);
+  const [selectedSprint, setSelectedSprint] = useState("Sprint 1");
+
+  // Función para asignar una historia a un sprint
+  const assignToSprint = (id) => {
+    setBacklog(
+      backlog.map((item) =>
+        item.id === id ? { ...item, sprint: selectedSprint } : item
+      )
+    );
+  };
+
+  // Función para cambiar el estado de una tarea
+  const changeState = (id, newState) => {
+    setBacklog(
+      backlog.map((item) =>
+        item.id === id ? { ...item, estado: newState } : item
+      )
+    );
+  };
+
+  // Filtrar historias asignadas al sprint actual
+  const sprintStories = backlog.filter((item) => item.sprint === selectedSprint);
+
+  // Calcular el esfuerzo total del sprint
+  const totalEffort = sprintStories.reduce((sum, item) => sum + item.esfuerzo, 0);
+
+  return (
+    <div style={styles.container}>
+      <h1>Sprint Planning</h1>
+
+      {/* Selector de sprint */}
+      <div style={styles.selector}>
+        <label>
+          Seleccionar Sprint:
+          <select
+            value={selectedSprint}
+            onChange={(e) => setSelectedSprint(e.target.value)}
+            style={styles.select}
+          >
+            <option value="Sprint 1">Sprint 1</option>
+            <option value="Sprint 2">Sprint 2</option>
+            <option value="Sprint 3">Sprint 3</option>
+            <option value="Sprint 4">Sprint 4</option>
+            <option value="Sprint 5">Sprint 5</option>
+            <option value="Sprint 6">Sprint 6</option>
+            <option value="Sprint 7">Sprint 7</option>
+            <option value="Sprint 8">Sprint 8</option>
+          </select>
+        </label>
+      </div>
+
+      {/* Backlog */}
+      <div style={styles.section}>
+        <h2>Backlog</h2>
+        <div style={styles.list}>
+          {backlog
+            .filter((item) => !item.sprint || item.sprint !== selectedSprint)
+            .map((item) => (
+              <BacklogCard key={item.id} item={item} onAssign={assignToSprint} />
+            ))}
+        </div>
+      </div>
+
+      {/* Sprint Actual */}
+      <div style={styles.section}>
+        <h2>{selectedSprint}</h2>
+        <p>Esfuerzo Total: {totalEffort}</p>
+        <div style={styles.list}>
+          {sprintStories.map((item) => (
+            <SprintCard
+              key={item.id}
+              item={item}
+              onChangeState={changeState}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Componente para representar cada ficha del backlog
+const BacklogCard = ({ item, onAssign }) => {
+  return (
+    <div style={styles.card}>
+      <h3>{item.alias}</h3>
+      <p>{item.enunciado}</p>
+      <p>
+        <strong>Esfuerzo:</strong> {item.esfuerzo}
+      </p>
+      <button onClick={() => onAssign(item.id)} style={styles.button}>
+        Asignar al Sprint
+      </button>
+    </div>
+  );
+};
+
+// Componente para representar cada ficha del sprint
+const SprintCard = ({ item, onChangeState }) => {
+  return (
+    <div style={styles.card}>
+      <h3>{item.alias}</h3>
+      <p>{item.enunciado}</p>
+      <p>
+        <strong>Esfuerzo:</strong> {item.esfuerzo}
+      </p>
+      <p>
+        <strong>Estado:</strong> {item.estado}
+      </p>
+      <div style={styles.actions}>
+        <button
+          onClick={() => onChangeState(item.id, "In Progress")}
+          style={styles.button}
+        >
+          En Progreso
+        </button>
+        <button
+          onClick={() => onChangeState(item.id, "Done")}
+          style={styles.button}
+        >
+          Completado
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Estilos básicos
+const styles = {
+  container: {
+    padding: "20px",
+    maxWidth: "1000px",
+    margin: "0 auto",
+    fontFamily: "Arial, sans-serif",
+  },
+  selector: {
+    marginBottom: "20px",
+  },
+  select: {
+    padding: "10px",
+    fontSize: "16px",
+    marginLeft: "10px",
+  },
+  section: {
+    marginBottom: "30px",
+  },
+  list: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+  },
+  card: {
+    padding: "15px",
+    backgroundColor: "#f9f9f9",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+  },
+  actions: {
+    marginTop: "10px",
+    display: "flex",
+    gap: "10px",
+  },
+  button: {
+    padding: "5px 10px",
+    fontSize: "14px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    backgroundColor: "#007bff",
+    color: "white",
+  },
+};
+
+export default App;
